@@ -15,3 +15,10 @@ The library exists because INI files in the wild use backslash escapes ad hoc, a
 One edge to know about: an unrecognised escape such as `\q` is passed through verbatim, backslash and all, rather than raising or dropping characters. This means round-tripping is not guaranteed for strings that contain unrecognised escapes — `unescape_value("\q")` returns `"\q"`, but `escape_value("\q")` returns `"\\q"`. That is intentional: the goal is fidelity for hand-written values, not a reversible codec for arbitrary strings.
 
 A trailing lone backslash at the end of a value is preserved on unescape rather than silently dropped.
+
+## Design notes
+
+The window stores values eagerly rather than keeping running aggregates. Running
+sums drift with floating point over long streams, and recomputing from a small
+buffer is cheap enough that the drift is not worth the speed.
+
